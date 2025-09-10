@@ -93,7 +93,7 @@ class RosarioScraper:
             self.driver.quit()
 
     # --- Utilidades adicionales ---
-    def _download_pdf(self, pdf_name: str, dest_dir: str = "output/pdfs") -> str:
+    def _download_pdf(self, pdf_name: str, dest_dir: str = "/tmp/scraper_output/pdfs") -> str:
         import os
         # Usar ruta absoluta basada en el directorio de trabajo
         if not os.path.isabs(dest_dir):
@@ -197,10 +197,10 @@ class RosarioScraper:
         r = requests.get("https://www.rosario.gob.ar/wms/planobase", params=params, timeout=30)
         r.raise_for_status()
         # Guardar la respuesta para depuración
-        os.makedirs("output/debug", exist_ok=True)
-        with open("output/debug/wms_response.png", "wb") as f:
+        os.makedirs("/tmp/scraper_output/debug", exist_ok=True)
+        with open("/tmp/scraper_output/debug/wms_response.png", "wb") as f:
             f.write(r.content)
-        logger.info(f"Imagen WMS descargada y guardada para depuración en output/debug/wms_response.png")
+        logger.info(f"Imagen WMS descargada y guardada para depuración en /tmp/scraper_output/debug/wms_response.png")
         return Image.open(BytesIO(r.content)).convert("RGBA")
 
     def _wms_getmap_image_bytes(self, bbox, srs: str, width=800):
@@ -651,8 +651,8 @@ class RosarioScraper:
                 cv2.circle(debug_img, (x, y), 5, (255, 0, 0), -1)
             
             # Guardar imagen de debug
-            os.makedirs("output/debug", exist_ok=True)
-            cv2.imwrite("output/debug/detected_lines.png", debug_img)
+            os.makedirs("/tmp/scraper_output/debug", exist_ok=True)
+            cv2.imwrite("/tmp/scraper_output/debug/detected_lines.png", debug_img)
             logger.info(f"Detectadas {len(detected_lines)} líneas y {len(geometric_elements)} elementos geométricos")
             
             return {
@@ -709,12 +709,12 @@ class RosarioScraper:
             logger.info(f"Región de recorte: ({x1}, {y1}) a ({x2}, {y2})")
             
             # Guardar imagen recortada
-            os.makedirs("output/crops", exist_ok=True)
+            os.makedirs("/tmp/scraper_output/crops", exist_ok=True)
             if address:
                 safe_addr = address.replace(' ', '_').replace('/', '_')
-                crop_filename = f"output/crops/crop_{safe_addr}.png"
+                crop_filename = f"/tmp/scraper_output/crops/crop_{safe_addr}.png"
             else:
-                crop_filename = "output/crops/crop_final.png"
+                crop_filename = "/tmp/scraper_output/crops/crop_final.png"
                 
             cv2.imwrite(crop_filename, cropped_img)
             logger.info(f"Imagen recortada guardada en: {crop_filename}")
@@ -1888,8 +1888,8 @@ class RosarioScraper:
             result_img = self._enhance_pdf_visibility(result_img, pdf_aligned)
             
             # Guardar imagen de depuración
-            os.makedirs("output/debug", exist_ok=True)
-            result_img.save("output/debug/ai_enhanced_overlay.png", format="PNG")
+            os.makedirs("/tmp/scraper_output/debug", exist_ok=True)
+            result_img.save("/tmp/scraper_output/debug/ai_enhanced_overlay.png", format="PNG")
             logger.info("Superposición con IA y optimización completada")
             
             return result_img
@@ -2142,7 +2142,7 @@ class RosarioScraper:
             logger.info(f"Mapa extraído del PDF: {len(map_data['lines'])} líneas, {len(map_data['parcels'])} parcelas, {len(map_data['text_regions'])} regiones de texto")
             
             # Guardar imagen de depuración con elementos detectados
-            os.makedirs("output/debug", exist_ok=True)
+            os.makedirs("/tmp/scraper_output/debug", exist_ok=True)
             debug_img = cv_img.copy()
             
             # Dibujar líneas detectadas
@@ -2164,8 +2164,8 @@ class RosarioScraper:
                 cv2.rectangle(debug_img, (x, y), (x+w, y+h), (255, 255, 0), 1)
             
             # Guardar imagen de depuración
-            cv2.imwrite("output/debug/pdf_map_analysis.png", debug_img)
-            logger.info("Análisis del mapa guardado en output/debug/pdf_map_analysis.png")
+            cv2.imwrite("/tmp/scraper_output/debug/pdf_map_analysis.png", debug_img)
+            logger.info("Análisis del mapa guardado en /tmp/scraper_output/debug/pdf_map_analysis.png")
             
             # Correlacionar con coordenadas web si están disponibles
             correlation_data = None
@@ -2205,12 +2205,12 @@ class RosarioScraper:
                 # Dibujar contorno de la parcela en la imagen recortada
                 parcel_contour_adjusted = target_parcel['contour'] - np.array([int(crop_x0), int(crop_y0)])
                 cv2.drawContours(debug_crop, [parcel_contour_adjusted], -1, (0, 255, 0), 3)
-                cv2.imwrite("output/debug/pdf_target_parcel.png", debug_crop)
+                cv2.imwrite("/tmp/scraper_output/debug/pdf_target_parcel.png", debug_crop)
                 logger.info(f"Parcela objetivo detectada: área {target_parcel['area']} px², centro ({center_x:.1f}, {center_y:.1f})")
                 
                 # Guardar la imagen recortada para depuración
-                pdf_cropped.save("output/debug/pdf_cropped.png", format="PNG")
-                logger.info("Imagen recortada del PDF guardada para depuración en output/debug/pdf_cropped.png")
+                pdf_cropped.save("/tmp/scraper_output/debug/pdf_cropped.png", format="PNG")
+                logger.info("Imagen recortada del PDF guardada para depuración en /tmp/scraper_output/debug/pdf_cropped.png")
                 
                 # Redimensionar al tamaño de la imagen base para mantener proporciones
                 base_img = Image.open(image_path).convert("RGBA")
@@ -2218,8 +2218,8 @@ class RosarioScraper:
                 pdf_resized = pdf_cropped.resize((W, H), Image.Resampling.LANCZOS)
                 
                 # Guardar la imagen base para depuración
-                base_img.save("output/debug/base_img.png", format="PNG")
-                logger.info("Imagen base guardada para depuración en output/debug/base_img.png")
+                base_img.save("/tmp/scraper_output/debug/base_img.png", format="PNG")
+                logger.info("Imagen base guardada para depuración en /tmp/scraper_output/debug/base_img.png")
                 
                 # Combinar la imagen base con el PDF recortado en lugar de reemplazarla
                 # Esto asegura que se vea tanto el mapa base como el PDF
@@ -2280,8 +2280,8 @@ class RosarioScraper:
             W, H = base_img.size
             
             # Guardar la imagen base para depuración
-            base_img.save("output/debug/base_img_fallback.png", format="PNG")
-            logger.info("Imagen base guardada para depuración en output/debug/base_img_fallback.png")
+            base_img.save("/tmp/scraper_output/debug/base_img_fallback.png", format="PNG")
+            logger.info("Imagen base guardada para depuración en /tmp/scraper_output/debug/base_img_fallback.png")
             
             # Usar superposición simple como respaldo
             try:
@@ -3107,7 +3107,7 @@ class RosarioScraper:
                 used_srs = epsg_used
                 
             # Crear directorio de salida
-            crops_dir = "output/crops"
+            crops_dir = "/tmp/scraper_output/crops"
             # Convertir a ruta absoluta si es relativa
             if not os.path.isabs(crops_dir):
                 crops_dir = os.path.join(os.getcwd(), crops_dir)

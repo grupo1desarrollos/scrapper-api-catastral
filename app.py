@@ -13,9 +13,12 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Directorio base del proyecto
+# Definir directorios - usar /tmp para evitar problemas de permisos
 BASE_DIR = Path(__file__).parent
-OUTPUT_DIR = BASE_DIR / "output"
+if os.path.exists('/tmp'):  # Sistema Linux/Unix
+    OUTPUT_DIR = Path('/tmp/scraper_output')
+else:  # Sistema Windows (desarrollo local)
+    OUTPUT_DIR = BASE_DIR / "output"
 PDFS_DIR = OUTPUT_DIR / "pdfs"
 CROPS_DIR = OUTPUT_DIR / "crops"
 
