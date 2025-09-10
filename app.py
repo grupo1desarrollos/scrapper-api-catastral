@@ -59,7 +59,7 @@ def scrape_address():
         
         # Ejecutar el scraper
         cmd = [
-            'python', 
+            'python3', 
             str(BASE_DIR / 'rosario_scraper.py'),
             '-a', address,
             '--headless'
@@ -132,7 +132,7 @@ def scrape_address_json():
         
         # Ejecutar el scraper
         cmd = [
-            'python', 
+            'python3', 
             str(BASE_DIR / 'rosario_scraper.py'),
             '-a', address,
             '--headless'
