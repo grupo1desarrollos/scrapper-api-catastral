@@ -1,0 +1,41 @@
+# Chrome browser files (auto-installed via Docker)
+chrome-win64/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Output files (keep structure but ignore content)
+output/crops/*
+!output/crops/.gitkeep
+output/debug/*
+!output/debug/.gitkeep
+output/pdfs/*
+!output/pdfs/.gitkeep
+output/test_results/*
+!output/test_results/.gitkeep
