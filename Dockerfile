@@ -50,9 +50,7 @@ RUN CHROME_VERSION=$(google-chrome --version | cut -d " " -f3 | cut -d "." -f1-3
     && rm -rf /tmp/chromedriver.zip /tmp/chromedriver-linux64
 
 # Crear usuario no-root para seguridad
-RUN useradd -m -u 1000 appuser && \
-    mkdir -p /app && \
-    chown -R appuser:appuser /app
+RUN useradd -m -u 1000 appuser
 
 # Establecer directorio de trabajo
 WORKDIR /app
@@ -64,9 +62,10 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copiar código de la aplicación
 COPY . .
 
-# Crear directorios necesarios
-RUN mkdir -p output/crops output/pdfs output/debug output/test_results && \
-    chown -R appuser:appuser /app
+# Crear directorios necesarios y establecer permisos
+RUN mkdir -p /app/output/crops /app/output/pdfs /app/output/debug /app/output/test_results && \
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /app/output
 
 # Cambiar a usuario no-root
 USER appuser

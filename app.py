@@ -21,7 +21,14 @@ CROPS_DIR = OUTPUT_DIR / "crops"
 
 # Asegurar que los directorios existen
 for directory in [OUTPUT_DIR, PDFS_DIR, CROPS_DIR]:
-    directory.mkdir(exist_ok=True)
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        # Asegurar permisos de escritura
+        os.chmod(directory, 0o755)
+    except PermissionError:
+        logger.warning(f"No se pudieron crear permisos para {directory}, usando directorio existente")
+    except Exception as e:
+        logger.error(f"Error creando directorio {directory}: {e}")
 
 @app.route('/health', methods=['GET'])
 def health_check():
