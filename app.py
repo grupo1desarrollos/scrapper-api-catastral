@@ -19,12 +19,23 @@ OUTPUT_DIR = BASE_DIR / "output"
 PDFS_DIR = OUTPUT_DIR / "pdfs"
 CROPS_DIR = OUTPUT_DIR / "crops"
 
-# Asegurar que los directorios existen
+# Crear directorios necesarios con permisos específicos
 for directory in [OUTPUT_DIR, PDFS_DIR, CROPS_DIR]:
     try:
-        directory.mkdir(parents=True, exist_ok=True)
-        # Asegurar permisos de escritura
-        os.chmod(directory, 0o755)
+        # Crear directorio con permisos 775 directamente
+        directory.mkdir(parents=True, exist_ok=True, mode=0o775)
+        # Intentar cambiar permisos si ya existe
+        try:
+            os.chmod(directory, 0o775)
+            logger.info(f"Directorio {directory} creado/actualizado con permisos 775")
+        except (PermissionError, OSError):
+            # Si no se pueden cambiar permisos, intentar con umask
+            old_umask = os.umask(0o002)  # Permite escritura para grupo
+            try:
+                directory.mkdir(parents=True, exist_ok=True)
+                logger.info(f"Directorio {directory} creado con umask modificado")
+            finally:
+                os.umask(old_umask)  # Restaurar umask original
     except PermissionError:
         logger.warning(f"No se pudieron crear permisos para {directory}, usando directorio existente")
     except Exception as e:

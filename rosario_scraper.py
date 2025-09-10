@@ -98,7 +98,25 @@ class RosarioScraper:
         # Usar ruta absoluta basada en el directorio de trabajo
         if not os.path.isabs(dest_dir):
             dest_dir = os.path.join(os.getcwd(), dest_dir)
-        os.makedirs(dest_dir, exist_ok=True)
+        
+        # Crear directorio con permisos específicos
+        try:
+            os.makedirs(dest_dir, exist_ok=True, mode=0o775)
+            try:
+                os.chmod(dest_dir, 0o775)
+                logger.info(f"Directorio {dest_dir} creado/actualizado con permisos 775")
+            except (PermissionError, OSError):
+                # Si no se pueden cambiar permisos, intentar con umask
+                old_umask = os.umask(0o002)
+                try:
+                    os.makedirs(dest_dir, exist_ok=True)
+                    logger.info(f"Directorio {dest_dir} creado con umask modificado")
+                finally:
+                    os.umask(old_umask)
+        except Exception as e:
+            logger.warning(f"Error creando directorio {dest_dir}: {e}")
+            # Intentar crear sin permisos específicos como fallback
+            os.makedirs(dest_dir, exist_ok=True)
         url = f"https://infomapa.rosario.gov.ar/emapa/servlets/verArchivo?path=manzanas/{pdf_name}"
         local_path = os.path.join(dest_dir, pdf_name)
         logger.info(f"Descargando PDF a: {local_path}")
@@ -3093,7 +3111,25 @@ class RosarioScraper:
             # Convertir a ruta absoluta si es relativa
             if not os.path.isabs(crops_dir):
                 crops_dir = os.path.join(os.getcwd(), crops_dir)
-            os.makedirs(crops_dir, exist_ok=True)
+            
+            # Crear directorio con permisos específicos
+            try:
+                os.makedirs(crops_dir, exist_ok=True, mode=0o775)
+                try:
+                    os.chmod(crops_dir, 0o775)
+                    logger.info(f"Directorio {crops_dir} creado/actualizado con permisos 775")
+                except (PermissionError, OSError):
+                    # Si no se pueden cambiar permisos, intentar con umask
+                    old_umask = os.umask(0o002)
+                    try:
+                        os.makedirs(crops_dir, exist_ok=True)
+                        logger.info(f"Directorio {crops_dir} creado con umask modificado")
+                    finally:
+                        os.umask(old_umask)
+            except Exception as e:
+                logger.warning(f"Error creando directorio {crops_dir}: {e}")
+                # Intentar crear sin permisos específicos como fallback
+                os.makedirs(crops_dir, exist_ok=True)
             safe_addr = re.sub(r"[^a-zA-Z0-9_-]+", "_", address)
             crop_path = os.path.join(crops_dir, f"{safe_addr}_{info['pdf_filename'].replace('.pdf','')}_full.png")
             
