@@ -65,7 +65,7 @@ COPY . .
 # Crear directorios necesarios y establecer permisos
 RUN mkdir -p /app/output/crops /app/output/pdfs /app/output/debug /app/output/test_results && \
     chown -R appuser:appuser /app && \
-    chmod -R 755 /app/output
+    chmod -R 775 /app/output
 
 # Cambiar a usuario no-root
 USER appuser
