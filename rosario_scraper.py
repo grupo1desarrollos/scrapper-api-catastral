@@ -95,6 +95,9 @@ class RosarioScraper:
     # --- Utilidades adicionales ---
     def _download_pdf(self, pdf_name: str, dest_dir: str = "output/pdfs") -> str:
         import os
+        # Usar ruta absoluta basada en el directorio de trabajo
+        if not os.path.isabs(dest_dir):
+            dest_dir = os.path.join(os.getcwd(), dest_dir)
         os.makedirs(dest_dir, exist_ok=True)
         url = f"https://infomapa.rosario.gov.ar/emapa/servlets/verArchivo?path=manzanas/{pdf_name}"
         local_path = os.path.join(dest_dir, pdf_name)
@@ -3050,7 +3053,9 @@ class RosarioScraper:
             logger.error(f"El scraping falló: {e}")
             if self.driver:
                 try:
-                    self.driver.save_screenshot("debug_screenshot.png")
+                    # Usar ruta absoluta para el screenshot
+                    screenshot_path = os.path.join(os.getcwd(), "debug_screenshot.png")
+                    self.driver.save_screenshot(screenshot_path)
                 except Exception as e_ss:
                     logger.error(f"No se pudo guardar el screenshot: {e_ss}")
             return {
@@ -3084,9 +3089,13 @@ class RosarioScraper:
                 used_srs = epsg_used
                 
             # Crear directorio de salida
-            os.makedirs("output/crops", exist_ok=True)
+            crops_dir = "output/crops"
+            # Convertir a ruta absoluta si es relativa
+            if not os.path.isabs(crops_dir):
+                crops_dir = os.path.join(os.getcwd(), crops_dir)
+            os.makedirs(crops_dir, exist_ok=True)
             safe_addr = re.sub(r"[^a-zA-Z0-9_-]+", "_", address)
-            crop_path = os.path.join("output/crops", f"{safe_addr}_{info['pdf_filename'].replace('.pdf','')}_full.png")
+            crop_path = os.path.join(crops_dir, f"{safe_addr}_{info['pdf_filename'].replace('.pdf','')}_full.png")
             
             # Extraer PDF como imagen completa
             try:
