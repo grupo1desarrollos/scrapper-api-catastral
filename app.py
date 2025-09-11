@@ -187,8 +187,8 @@ def scrape_address_json():
             'address': address,
             'timestamp': datetime.now().isoformat(),
             'files': {
-                'image': str(latest_crop.relative_to(BASE_DIR)),
-                'pdf': str(latest_pdf.relative_to(BASE_DIR)) if latest_pdf else None
+                'image': str(latest_crop),
+                'pdf': str(latest_pdf) if latest_pdf else None
             },
             'download_urls': {
                 'image': f'/download/image/{latest_crop.name}',
